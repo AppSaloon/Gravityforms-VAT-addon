@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Gravity Forms Vat Field Add-On
-Plugin URI: http://www.gravityforms.com
-Description: A vat add-on to demonstrate how to use the Add-On Framework to include a new field type.
-Version: 1.0
-Author: Rocketgenius
-Author URI: http://www.rocketgenius.com
+Plugin URI: https://www.appsaloon.be
+Description: A GF vat add-on to check the VAT number on a VAT service
+Version: 1.0.0
+Author: AppSaloon
+Author URI: https://www.appsaloon.be
 Text Domain: vatfieldaddon
 Domain Path: /languages
 
