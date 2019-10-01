@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  * https://javascript.info/fetch
  */
 
-define( 'GF_VAT_FIELD_ADDON_VERSION', '1.0' );
+define( 'GF_VAT_FIELD_ADDON_VERSION', '1.0.0' );
 
 require_once __DIR__ . '/vendor/autoload.php';
 
