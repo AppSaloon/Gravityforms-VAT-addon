@@ -1,0 +1,23 @@
+dist: trusty
+language: php
+php:
+- 7.1
+- 7.2
+- 7.3
+addons:
+  sonarcloud:
+    organization: "dragonbe-github" # the key of the org you chose at step #3
+    token:
+      secure: "tSNywFsYthwLQc89JpDthdVgU91E6A5VYs1n95FC5hPWZZxc6kYCkLAA6dD8pLi0BRTx5zStWN6IAdH0sB5xgexeu5lBAuyDr66v3B/TtPMyXyD5YIUbb0JyylA3rW45lSOqUV439Qhniqyu59VD7HCeCS8B64k7XW9tOGcL4yc="
+
+before_script:
+- composer install --prefer-source --no-interaction
+script:
+- mkdir -p build/logs
+- vendor/bin/phpcs
+- vendor/bin/phpunit
+- sonar-scanner
+
+cache:
+  directories:
+    - '$HOME/.sonar/cache'
