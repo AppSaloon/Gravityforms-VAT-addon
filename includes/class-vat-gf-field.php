@@ -284,11 +284,11 @@ class Vat_GF_Field extends GF_Field {
 			if ( $is_sub_label_above ) {
 				$company_address = "<span class='ginput_full{$class_suffix} vat_company_address' id='{$field_id}_2_container' {$style}>
                                         <label for='{$field_id}_2' id='{$field_id}_2_label' {$sub_label_class_attribute}>{$company_address_sub_label}</label>
-                                        <input type='text' name='input_{$id}.2' id='{$field_id}_2' value='{$company_address_value}' {$tabindex} {$disabled_text} {$company_address_placeholder_attribute} disabled/>
+                                        <input type='text' name='input_{$id}.2' id='{$field_id}_2' value='{$company_address_value}' {$tabindex} {$disabled_text} {$company_address_placeholder_attribute} readonly/>
                                     </span>";
 			} else {
 				$company_address = "<span class='ginput_full{$class_suffix} vat_company_address' id='{$field_id}_2_container' {$style}>
-                                        <input type='text' name='input_{$id}.2' id='{$field_id}_2' value='{$company_address_value}' {$tabindex} {$disabled_text} {$company_address_placeholder_attribute} disabled/>
+                                        <input type='text' name='input_{$id}.2' id='{$field_id}_2' value='{$company_address_value}' {$tabindex} {$disabled_text} {$company_address_placeholder_attribute} readonly/>
                                         <label for='{$field_id}_2' id='{$field_id}_2_label' {$sub_label_class_attribute}>{$company_address_sub_label}</label>
                                     </span>";
 			}
@@ -302,11 +302,11 @@ class Vat_GF_Field extends GF_Field {
 			if ( $is_sub_label_above ) {
 				$company_name = "<span class='ginput_{$company_name_location}{$class_suffix} vat_company_name' id='{$field_id}_3_container' {$style}>
                                     <label for='{$field_id}_3' id='{$field_id}_3_label' {$sub_label_class_attribute}>{$company_name_sub_label}</label>
-                                    <input type='text' name='input_{$id}.3' id='{$field_id}_3' value='{$company_name_value}' {$tabindex} {$disabled_text} {$company_name_placeholder_attribute} {$required_attribute} disabled/>
+                                    <input type='text' name='input_{$id}.3' id='{$field_id}_3' value='{$company_name_value}' {$tabindex} {$disabled_text} {$company_name_placeholder_attribute} {$required_attribute} readonly/>
                                  </span>";
 			} else {
 				$company_name = "<span class='ginput_{$company_name_location}{$class_suffix} vat_company_name' id='{$field_id}_3_container' {$style}>
-                                    <input type='text' name='input_{$id}.3' id='{$field_id}_3' value='{$company_name_value}' {$tabindex} {$disabled_text} {$company_name_placeholder_attribute} {$required_attribute} disabled/>
+                                    <input type='text' name='input_{$id}.3' id='{$field_id}_3' value='{$company_name_value}' {$tabindex} {$disabled_text} {$company_name_placeholder_attribute} {$required_attribute} readonly/>
                                     <label for='{$field_id}_3' id='{$field_id}_3_label' {$sub_label_class_attribute}>{$company_name_sub_label}</label>
                                  </span>";
 			}
@@ -318,11 +318,11 @@ class Vat_GF_Field extends GF_Field {
 			if ( $is_sub_label_above ) {
 				$country = "<span class='ginput_{$country_location}{$class_suffix} vat_country' id='{$field_id}_6_container' {$style}>
                                         <label for='{$field_id}_6' id='{$field_id}_6_label' {$sub_label_class_attribute}>{$address_country_sub_label}</label>
-                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} disabled>{$country_list}</select>
+                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} readonly>{$country_list}</select>
                                     </span>";
 			} else {
 				$country = "<span class='ginput_{$country_location}{$class_suffix} vat_country' id='{$field_id}_6_container' {$style}>
-                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} disabled>{$country_list}</select>
+                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} readonly>{$country_list}</select>
                                         <label for='{$field_id}_6' id='{$field_id}_6_label' {$sub_label_class_attribute}>{$address_country_sub_label}</label>
                                     </span>";
 			}
