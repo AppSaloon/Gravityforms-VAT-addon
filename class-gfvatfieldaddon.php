@@ -69,34 +69,36 @@ class GFVatFieldAddOn extends GFAddOn {
 
 
                 html = "<table class='field_custom_inputs_ui'><tr>";
-                html += "<td><strong>" + <?php echo json_encode( esc_html__( 'Show', 'gravityforms' ) ); ?>+ "</strong></td>";
+                html += "<td><strong>" + <?php echo json_encode( esc_html__( 'Show',
+					'gravityforms' ) ); ?>+"</strong></td>";
                 html += "<td><strong><?php esc_html_e( 'Field', 'gravityforms' );?></strong></td></tr>";
 
-                if( field["inputs"] === null ) {
+                if ( field[ "inputs" ] === null ) {
                     return html;
                 }
 
-                for (var i = 1; i < field["inputs"].length; i++) {
-                    input = field["inputs"][i];
+                for ( var i = 1; i < field[ "inputs" ].length; i++ ) {
+                    input = field[ "inputs" ][ i ];
                     id = input.id;
                     inputName = 'input_' + id.toString();
-                    inputId = inputName.replace('.', '_');
-                    if (jQuery('label[for="' + inputId + '"]').length == 0) {
+                    inputId = inputName.replace( '.', '_' );
+                    if ( jQuery( 'label[for="' + inputId + '"]' ).length == 0 ) {
                         continue;
                     }
                     isHidden = typeof input.isHidden != 'undefined' && input.isHidden ? true : false;
-                    title = isHidden ? <?php echo json_encode( esc_html__( 'Inactive', 'gravityforms' ) ); ?> : <?php echo json_encode( esc_html__( 'Active', 'gravityforms' ) ); ?>;
+                    title = isHidden ? <?php echo json_encode( esc_html__( 'Inactive',
+						'gravityforms' ) ); ?> : <?php echo json_encode( esc_html__( 'Active', 'gravityforms' ) ); ?>;
                     img = isHidden ? 'active0.png' : 'active1.png';
                     html += "<tr data-input_id='" + id + "' class='field_custom_input_row field_custom_input_row_" + inputId + "'>";
 
                     // show
                     html += "<td><img data-input_id='" + input.id + "' title='" + title + "' alt='" + title + "' class='input_active_icon' src='" + imagesUrl + img + "'/></td>";
 
-                    if (isHidden) {
-                        jQuery("#input_" + inputId + "_container").toggle(!isHidden);
+                    if ( isHidden ) {
+                        jQuery( "#input_" + inputId + "_container" ).toggle( !isHidden );
                     }
                     defaultLabel = typeof input.defaultLabel != 'undefined' ? input.defaultLabel : input.label;
-                    defaultLabel = defaultLabel.replace(/'/g, "&#039;");
+                    defaultLabel = defaultLabel.replace( /'/g, "&#039;" );
                     html += "<td><label id='field_custom_input_default_label_" + inputId + "' for='field_custom_input_label_" + input.id + "' class='inline'>" + defaultLabel + "</label></td>";
                     html += "</tr>";
                 }
@@ -105,13 +107,13 @@ class GFVatFieldAddOn extends GFAddOn {
             }
 
             function UpgradeVatField( field ) {
-                if( field["inputs"] !== undefined ) {
-                    for (var i = 1; i < field["inputs"].length; i++) {
-                        const inputId = field['inputs'][i].id.toString();
-                        const number = inputId.replace('.', '_');
+                if ( field[ "inputs" ] !== undefined ) {
+                    for ( var i = 1; i < field[ "inputs" ].length; i++ ) {
+                        const inputId = field[ 'inputs' ][ i ].id.toString();
+                        const number = inputId.replace( '.', '_' );
 
-                        if( jQuery('#input_' + number + "_container").is(':visible') === false ) {
-                            field["inputs"][i].isHidden = true;
+                        if ( jQuery( '#input_' + number + "_container" ).is( ':visible' ) === false ) {
+                            field[ "inputs" ][ i ].isHidden = true;
                         }
                     }
                 }
@@ -128,7 +130,7 @@ class GFVatFieldAddOn extends GFAddOn {
                 /**
                  * FIELD type must be 'vat'
                  **/
-                if( field.type !== 'vat' ) {
+                if ( field.type !== 'vat' ) {
                     return;
                 }
 
@@ -140,7 +142,7 @@ class GFVatFieldAddOn extends GFAddOn {
                 /**
                  *  Update VAT field (isHidden or not)
                  **/
-                field = UpgradeVatField(field);
+                field = UpgradeVatField( field );
 
                 /**
                  * Build the HTML
@@ -152,11 +154,11 @@ class GFVatFieldAddOn extends GFAddOn {
             /**
              * Show toggle visible block
              */
-            jQuery('.vat_setting')
-                .on('click keypress', '.input_active_icon', function(){
-                    var inputId = jQuery(this).closest('.field_custom_input_row').data('input_id');
-                    ToggleInputHidden(this, inputId);
-                })
+            jQuery( '.vat_setting' )
+                .on( 'click keypress', '.input_active_icon', function () {
+                    var inputId = jQuery( this ).closest( '.field_custom_input_row' ).data( 'input_id' );
+                    ToggleInputHidden( this, inputId );
+                } )
         </script>
 		<?php
 	}
@@ -300,7 +302,7 @@ class GFVatFieldAddOn extends GFAddOn {
 				$response = array(
 					'vat_number'      => $validated->getVatNumber(),
 					'country_code'    => $validated->getCountryCode(),
-					'company_address' => $validated->getAddress(),
+					'company_address' => str_replace( PHP_EOL, ' ', $validated->getAddress() ),
 					'company_name'    => $validated->getName(),
 				);
 
@@ -314,7 +316,8 @@ class GFVatFieldAddOn extends GFAddOn {
 			}
 
 		} catch ( Exception $e ) {
-			$response['error_msg'] = $e->getCode() . ' - ' . $e->getMessage();
+			$response['error_msg'] = sprintf( __( 'Service is not available at the moment, please try again later. (%s)',
+				'vatfieldaddon' ), $e->getMessage() );
 
 			wp_send_json_error( $response );
 		}
@@ -325,16 +328,26 @@ class GFVatFieldAddOn extends GFAddOn {
 		//so we need to add a case for our new field type
 		?>
         case 'vat':
-            if (!field.label)
-            field.label = <?php echo json_encode( esc_html__( 'VAT', 'gravityforms' ) ); ?>;
-            field.inputs = [
-            new Input(field.id + 0.1, <?php echo json_encode( gf_apply_filters( array( 'gform_vat', rgget( 'id' ) ), esc_html__( 'VAT number', 'gravityforms' ), rgget( 'id' ) ) ); ?>),
-            new Input(field.id + 0.2, <?php echo json_encode( gf_apply_filters( array( 'gform_company_address', rgget( 'id' ) ), esc_html__( 'Company Address', 'gravityforms' ), rgget( 'id' ) ) ); ?>),
-            new Input(field.id + 0.3, <?php echo json_encode( gf_apply_filters( array( 'gform_company_name', rgget( 'id' ) ), esc_html__( 'Company Name', 'gravityforms' ), rgget( 'id' ) ) ); ?>),
-            new Input(field.id + 0.6, <?php echo json_encode( gf_apply_filters( array( 'gform_address_country', rgget( 'id' ) ), esc_html__( 'Country', 'gravityforms' ), rgget( 'id' ) ) ); ?>)
-            ];
+        if (!field.label)
+        field.label = <?php echo json_encode( esc_html__( 'VAT', 'gravityforms' ) ); ?>;
+        field.inputs = [
+        new Input(field.id + 0.1, <?php echo json_encode( gf_apply_filters( array( 'gform_vat', rgget( 'id' ) ),
+			esc_html__( 'VAT number', 'gravityforms' ), rgget( 'id' ) ) ); ?>),
+        new Input(field.id + 0.2, <?php echo json_encode( gf_apply_filters( array(
+			'gform_company_address',
+			rgget( 'id' ),
+		), esc_html__( 'Company Address', 'gravityforms' ), rgget( 'id' ) ) ); ?>),
+        new Input(field.id + 0.3, <?php echo json_encode( gf_apply_filters( array(
+			'gform_company_name',
+			rgget( 'id' ),
+		), esc_html__( 'Company Name', 'gravityforms' ), rgget( 'id' ) ) ); ?>),
+        new Input(field.id + 0.6, <?php echo json_encode( gf_apply_filters( array(
+			'gform_address_country',
+			rgget( 'id' ),
+		), esc_html__( 'Country', 'gravityforms' ), rgget( 'id' ) ) ); ?>)
+        ];
 
-            break;
+        break;
 
 		<?php
 	}

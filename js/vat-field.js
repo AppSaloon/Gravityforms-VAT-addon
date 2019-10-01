@@ -26,6 +26,17 @@ function callVatService( vat, parentId ) {
         success: function ( response, textStatus, jQxhr ) {
             if ( response.success === false ) {
                 console.log( response.data.error_msg );
+
+                jQuery("#" + parentId + ' .vat_number input')
+                jQuery("#" + parentId ).append( '<div class="vat-warning">' + response.data.error_msg + '</div>' );
+
+                setTimeout( function(){
+                    jQuery('.vat-warning').remove();
+                }, 5000);
+                /**
+                 * Show message that the service is down.
+                 */
+
             } else {
                 jQuery( '#' + parentId + ' .vat_company_address input' ).val( response.data.company_address );
                 jQuery( '#' + parentId + ' .vat_company_name input' ).val( response.data.company_name );
