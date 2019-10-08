@@ -41,20 +41,14 @@ class Vat_GF_Field extends GF_Field {
 		return array(
 			'error_message_setting',
 			'label_setting',
-			'admin_label_setting',
-			'description_setting',
 			'rules_setting',
 			'placeholder_setting',
 			'input_class_setting',
 			'css_class_setting',
 			'size_setting',
-			'admin_label_setting',
-			'default_value_setting',
 			'visibility_setting',
 			'conditional_logic_field_setting',
 			'rules_setting',
-			'copy_values_option',
-			'prepopulate_field_setting',
 			'description_setting',
 			'vat_setting',
 		);
@@ -72,12 +66,6 @@ class Vat_GF_Field extends GF_Field {
 	function validate( $value, $form ) {
 
 		if ( $this->isRequired ) {
-			$copy_values_option_activated = $this->enableCopyValuesOption && rgpost( 'input_' . $this->id . '_copy_values_activated' );
-			if ( $copy_values_option_activated ) {
-				// validation will occur in the source field
-				return;
-			}
-
 			$vat = rgar( $value, $this->id . '.1' );
 
 			if ( empty( $vat ) && ! $this->get_input_property( $this->id . '.1', 'isHidden' )
@@ -92,34 +80,9 @@ class Vat_GF_Field extends GF_Field {
 
 	public function get_value_submission( $field_values, $get_from_post_global_var = true ) {
 
-		$value                                         = parent::get_value_submission( $field_values,
-			$get_from_post_global_var );
-		$value[ $this->id . '_copy_values_activated' ] = (bool) rgpost( 'input_' . $this->id . '_copy_values_activated' );
+		$value = parent::get_value_submission( $field_values, $get_from_post_global_var );
 
 		return $value;
-	}
-
-	/**
-	 * The scripts to be included in the form editor.
-	 *
-	 * @return string
-	 */
-	public function get_form_editor_inline_script_on_page_render() {
-
-		// set the default field label for the vat type field
-		$script = sprintf( "function SetDefaultValues_simple(field) {field.label = '%s';}",
-				$this->get_form_editor_field_title() ) . PHP_EOL;
-
-		// initialize the fields custom settings
-		$script .= "jQuery(document).bind('gform_load_field_settings', function (event, field, form) {" .
-		           "var inputClass = field.inputClass == undefined ? '' : field.inputClass;" .
-		           "jQuery('#input_class_setting').val(inputClass);" .
-		           "});" . PHP_EOL;
-
-		// saving the vat setting
-		$script .= "function SetInputClassSetting(value) {SetFieldProperty('inputClass', value);}" . PHP_EOL;
-
-		return $script;
 	}
 
 	/**
@@ -132,7 +95,6 @@ class Vat_GF_Field extends GF_Field {
 	 * @return string
 	 */
 	public function get_field_input( $form, $value = '', $entry = null ) {
-		$this->hideAytac = true;
 		$is_entry_detail = $this->is_entry_detail();
 		$is_form_editor  = $this->is_form_editor();
 		$is_admin        = $is_entry_detail || $is_form_editor;
@@ -149,7 +111,6 @@ class Vat_GF_Field extends GF_Field {
 		$form_sub_label_placement  = rgar( $form, 'subLabelPlacement' );
 		$field_sub_label_placement = $this->subLabelPlacement;
 		$is_sub_label_above        = $field_sub_label_placement == 'above' || ( empty( $field_sub_label_placement ) && $form_sub_label_placement == 'above' );
-		$sub_label_class_attribute = $field_sub_label_placement == 'hidden_label' ? "class='hidden_sub_label screen-reader-text'" : '';
 
 		$vat_value             = '';//street_value
 		$company_address_value = '';//street2_value
@@ -169,44 +130,11 @@ class Vat_GF_Field extends GF_Field {
 		$company_name_field_input    = GFFormsModel::get_input( $this, $this->id . '.3' );
 		$address_country_field_input = GFFormsModel::get_input( $this, $this->id . '.6' );
 
-		// Placeholders.
-		$vat_placeholder_attribute             = GFCommon::get_input_placeholder_attribute( $vat_field_input );
-		$company_address_placeholder_attribute = GFCommon::get_input_placeholder_attribute( $company_address_field_input );
-		$company_name_placeholder_attribute    = GFCommon::get_input_placeholder_attribute( $company_name_field_input );
-
-		$hide_country = $this->hideCountry || rgar( $address_country_field_input,
-				'isHidden' );
-
-		$this->hideCountry = true;
-
-		if ( empty( $country_value ) ) {
-			$country_value = $this->defaultCountry;
-		}
-
-		$country_placeholder = GFCommon::get_input_placeholder_value( $address_country_field_input );
-		$country_list        = $this->get_country_dropdown( $country_value, $country_placeholder );
-
 		// Changing css classes based on field format to ensure proper display.
-		$vat_display_format    = apply_filters( 'gform_address_display_format', 'default', $this );
-		$company_name_location = $vat_display_format == 'zip_before_city' ? 'right' : 'left';
-		$country_location      = $this->hideState ? 'left' : 'right'; // support for $this->hideState legacy property
+		$company_name_location = 'left';
+		$country_location      = 'right';
 
 		// Labels.
-		// VAT number
-		$vat_sub_label = rgar( $vat_field_input, 'customLabel' ) != ''
-			? $vat_field_input['customLabel']
-			: esc_html__( 'VAT', 'vatfieldaddon' );
-
-		$vat_sub_label = gf_apply_filters(
-			array(
-				'gform_address_street',
-				$form_id,
-				$this->id,
-			),
-			$vat_sub_label,
-			$form_id
-		);
-
 		// address company address
 		$company_address_sub_label = rgar( $company_address_field_input, 'customLabel' ) != ''
 			? $company_address_field_input['customLabel']
@@ -252,6 +180,18 @@ class Vat_GF_Field extends GF_Field {
 			$form_id
 		);
 
+		// Placeholders.
+		$vat_placeholder_attribute = $this->get_field_placeholder_attribute();
+
+		// use label as placeholder
+		$company_address_placeholder_attribute = $this->get_placeholder_html( $company_address_sub_label );
+		$company_name_placeholder_attribute    = $this->get_placeholder_html( $company_name_sub_label );
+
+		$hide_country = rgar( $address_country_field_input, 'isHidden' );
+
+		//$country_placeholder = GFCommon::get_input_placeholder_value( $address_country_field_input );
+		$country_list        = $this->get_country_dropdown( $country_value, $address_country_sub_label );
+
 		// VAT field.
 		$vat      = '';
 		$tabindex = $this->get_tabindex();
@@ -259,13 +199,13 @@ class Vat_GF_Field extends GF_Field {
 		if ( $is_admin || ! rgar( $vat_field_input, 'isHidden' ) ) {
 			if ( $is_sub_label_above ) {
 				$vat = " <span class='ginput_full{$class_suffix} vat_number' id='{$field_id}_1_container' {$style}>
-                                        <label for='{$field_id}_1' id='{$field_id}_1_label' {$sub_label_class_attribute}>{$vat_sub_label}</label>
+                                        <label for='{$field_id}_1' id='{$field_id}_1_label'></label>
                                         <input type='text' name='input_{$id}.1' id='{$field_id}_1' value='{$vat_value}' {$tabindex} {$disabled_text} {$vat_placeholder_attribute} {$required_attribute}/>
                                     </span>";
 			} else {
 				$vat = " <span class='ginput_full{$class_suffix} vat_number' id='{$field_id}_1_container' {$style}>
                                         <input type='text' name='input_{$id}.1' id='{$field_id}_1' value='{$vat_value}' {$tabindex} {$disabled_text} {$vat_placeholder_attribute} {$required_attribute}/>
-                                        <label for='{$field_id}_1' id='{$field_id}_1_label' {$sub_label_class_attribute}>{$vat_sub_label}</label>
+                                        <label for='{$field_id}_1' id='{$field_id}_1_label'></label>
                                     </span>";
 			}
 
@@ -283,13 +223,13 @@ class Vat_GF_Field extends GF_Field {
 			$tabindex = $this->get_tabindex();
 			if ( $is_sub_label_above ) {
 				$company_address = "<span class='ginput_full{$class_suffix} vat_company_address' id='{$field_id}_2_container' {$style}>
-                                        <label for='{$field_id}_2' id='{$field_id}_2_label' {$sub_label_class_attribute}>{$company_address_sub_label}</label>
+                                        <label for='{$field_id}_2' id='{$field_id}_2_label'>{$company_address_sub_label}</label>
                                         <input type='text' name='input_{$id}.2' id='{$field_id}_2' value='{$company_address_value}' {$tabindex} {$disabled_text} {$company_address_placeholder_attribute} readonly/>
                                     </span>";
 			} else {
 				$company_address = "<span class='ginput_full{$class_suffix} vat_company_address' id='{$field_id}_2_container' {$style}>
                                         <input type='text' name='input_{$id}.2' id='{$field_id}_2' value='{$company_address_value}' {$tabindex} {$disabled_text} {$company_address_placeholder_attribute} readonly/>
-                                        <label for='{$field_id}_2' id='{$field_id}_2_label' {$sub_label_class_attribute}>{$company_address_sub_label}</label>
+                                        <label for='{$field_id}_2' id='{$field_id}_2_label'>{$company_address_sub_label}</label>
                                     </span>";
 			}
 		}
@@ -301,13 +241,13 @@ class Vat_GF_Field extends GF_Field {
 		if ( $is_admin || ! rgar( $company_name_field_input, 'isHidden' ) ) {
 			if ( $is_sub_label_above ) {
 				$company_name = "<span class='ginput_{$company_name_location}{$class_suffix} vat_company_name' id='{$field_id}_3_container' {$style}>
-                                    <label for='{$field_id}_3' id='{$field_id}_3_label' {$sub_label_class_attribute}>{$company_name_sub_label}</label>
+                                    <label for='{$field_id}_3' id='{$field_id}_3_label'>{$company_name_sub_label}</label>
                                     <input type='text' name='input_{$id}.3' id='{$field_id}_3' value='{$company_name_value}' {$tabindex} {$disabled_text} {$company_name_placeholder_attribute} {$required_attribute} readonly/>
                                  </span>";
 			} else {
 				$company_name = "<span class='ginput_{$company_name_location}{$class_suffix} vat_company_name' id='{$field_id}_3_container' {$style}>
                                     <input type='text' name='input_{$id}.3' id='{$field_id}_3' value='{$company_name_value}' {$tabindex} {$disabled_text} {$company_name_placeholder_attribute} {$required_attribute} readonly/>
-                                    <label for='{$field_id}_3' id='{$field_id}_3_label' {$sub_label_class_attribute}>{$company_name_sub_label}</label>
+                                    <label for='{$field_id}_3' id='{$field_id}_3_label'>{$company_name_sub_label}</label>
                                  </span>";
 			}
 		}
@@ -317,13 +257,13 @@ class Vat_GF_Field extends GF_Field {
 			$tabindex = $this->get_tabindex();
 			if ( $is_sub_label_above ) {
 				$country = "<span class='ginput_{$country_location}{$class_suffix} vat_country' id='{$field_id}_6_container' {$style}>
-                                        <label for='{$field_id}_6' id='{$field_id}_6_label' {$sub_label_class_attribute}>{$address_country_sub_label}</label>
-                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} readonly>{$country_list}</select>
+                                        <label for='{$field_id}_6' id='{$field_id}_6_label'>{$address_country_sub_label}</label>
+                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} disabled>{$country_list}</select>
                                     </span>";
 			} else {
 				$country = "<span class='ginput_{$country_location}{$class_suffix} vat_country' id='{$field_id}_6_container' {$style}>
-                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} readonly>{$country_list}</select>
-                                        <label for='{$field_id}_6' id='{$field_id}_6_label' {$sub_label_class_attribute}>{$address_country_sub_label}</label>
+                                        <select name='input_{$id}.6' id='{$field_id}_6' {$tabindex} {$disabled_text} {$required_attribute} disabled>{$country_list}</select>
+                                        <label for='{$field_id}_6' id='{$field_id}_6_label'>{$address_country_sub_label}</label>
                                     </span>";
 			}
 		} else {
@@ -333,25 +273,9 @@ class Vat_GF_Field extends GF_Field {
 
 		$inputs = $vat . $company_address . $company_name . $country;
 
-		$copy_values_option = '';
-		$input_style        = '';
-		if ( ( $this->enableCopyValuesOption || $is_form_editor ) && ! $is_entry_detail ) {
-			$copy_values_style      = $is_form_editor && ! $this->enableCopyValuesOption ? "style='display:none;'" : '';
-			$copy_values_is_checked = isset( $value[ $this->id . '_copy_values_activated' ] ) ? $value[ $this->id . '_copy_values_activated' ] == true : $this->copyValuesOptionDefault == true;
-			$copy_values_checked    = checked( true, $copy_values_is_checked, false );
-			$copy_values_option     = "<div id='{$field_id}_copy_values_option_container' class='copy_values_option_container' {$copy_values_style}>
-                                        <input type='checkbox' id='{$field_id}_copy_values_activated' class='copy_values_activated' value='1' name='input_{$id}_copy_values_activated' {$disabled_text} {$copy_values_checked}/>
-                                        <label for='{$field_id}_copy_values_activated' id='{$field_id}_copy_values_option_label' class='copy_values_option_label inline'>{$this->copyValuesOptionLabel}</label>
-                                    </div>";
-			if ( $copy_values_is_checked ) {
-				$input_style = "style='display:none;'";
-			}
-		}
-
 		$css_class = $this->get_css_class();
 
-		return "    {$copy_values_option}
-                    <div class='ginput_complex{$class_suffix} ginput_container {$css_class}' id='$field_id' {$input_style}>
+		return "    <div class='ginput_complex{$class_suffix} ginput_container {$css_class}' id='$field_id' >
                         {$inputs}
                     <div class='gf_clear gf_clear_complex'></div>
                 </div>";
@@ -387,6 +311,7 @@ class Vat_GF_Field extends GF_Field {
 		$str              = '';
 		$selected_country = strtolower( $selected_country );
 		$countries        = array_merge( array( '' ), $this->get_country_codes() );
+
 		foreach ( $countries as $country => $code ) {
 			if ( is_numeric( $code ) ) {
 				$code = $country;
@@ -444,47 +369,70 @@ class Vat_GF_Field extends GF_Field {
 		return $codes;
 	}
 
-	// # FIELD FILTER UI HELPERS ---------------------------------------------------------------------------------------
+	public function get_value_entry_detail(
+		$value,
+		$currency = '',
+		$use_text = false,
+		$format = 'html',
+		$media = 'screen'
+	) {
+		if ( is_array( $value ) ) {
+			$vat_number      = trim( rgget( $this->id . '.1', $value ) );
+			$company_address = trim( rgget( $this->id . '.2', $value ) );
+			$company_name    = trim( rgget( $this->id . '.3', $value ) );
+			$country_value   = trim( rgget( $this->id . '.6', $value ) );
 
-	/**
-	 * Returns the sub-filters for the current field.
-	 *
-	 * @return array
-	 * @since 2.4
-	 *
-	 */
-	public function get_filter_sub_filters() {
-		$sub_filters = array();
-		$inputs      = $this->inputs;
+			if ( $format === 'html' ) {
+				$vat_number      = esc_html( $vat_number );
+				$company_address = esc_html( $company_address );
+				$company_name    = esc_html( $company_name );
+				$country_value   = esc_html( $country_value );
 
-		foreach ( $inputs as $input ) {
-			if ( rgar( $input, 'isHidden' ) ) {
-				continue;
+				$line_break = '<br />';
+			} else {
+				$line_break = "\n";
 			}
 
-			$sub_filters[] = array(
-				'key'             => rgar( $input, 'id' ),
-				'text'            => rgar( $input, 'customLabel', rgar( $input, 'label' ) ),
-				'preventMultiple' => false,
-				'operators'       => $this->get_filter_operators(),
-			);
-		}
+			/**
+			 * Filters the format that the address is displayed in.
+			 *
+			 * @param  string           'default' The format to use. Defaults to 'default'.
+			 * @param  Vat_GF_Field  $this  An instance of the Vat_GF_Field object.
+			 *
+			 * @since Unknown
+			 *
+			 */
+			$response = $vat_number;
+			$response .= ! empty( $address ) && ! empty( $company_address ) ? $line_break . $company_address : $company_address;
+			$response .= ! empty( $address ) && ( ! empty( $company_name ) || ! empty( $state_value ) ) ? $line_break . $company_name : $company_name;
+			$response .= ! empty( $address ) && ! empty( $country_value ) ? $line_break . $country_value : $country_value;
 
-		return $sub_filters;
+			return $response;
+		} else {
+			return '';
+		}
 	}
 
 	/**
-	 * Returns the filter operators for the current field.
+	 * Sanitizes the field settings.
 	 *
-	 * @return array
-	 * @since 2.4
+	 * @return void
+	 * @uses    GF_Field::sanitize_settings()
+	 * @uses    GF_Field_Phone::get_phone_format()
+	 * @uses    GF_Field_Phone::$phoneFormat
 	 *
+	 * @since  Unknown
+	 * @access public
+	 *
+	 * @used-by GFFormDetail::add_field()
+	 * @used-by GFFormsModel::sanitize_settings()
 	 */
-	public function get_filter_operators() {
-		$operators   = parent::get_filter_operators();
-		$operators[] = 'contains';
+	public function sanitize_settings() {
+		parent::sanitize_settings();
+	}
 
-		return $operators;
+	private function get_placeholder_html( $placeholder_value = '' ) {
+		return sprintf( "placeholder='%s'", esc_attr( $placeholder_value ) );
 	}
 }
 

@@ -71,7 +71,9 @@ class GFVatFieldAddOn extends GFAddOn {
                 html = "<table class='field_custom_inputs_ui'><tr>";
                 html += "<td><strong>" + <?php echo json_encode( esc_html__( 'Show',
 					'gravityforms' ) ); ?>+"</strong></td>";
-                html += "<td><strong><?php esc_html_e( 'Field', 'gravityforms' );?></strong></td></tr>";
+                html += "<td><strong><?php esc_html_e( 'Field', 'gravityforms' );?></strong></td>";
+                html += "<td><strong>" + <?php echo json_encode( esc_html__( 'Custom Sub-Label', 'gravityforms' ) ); ?> + "</strong></td>";
+                html + "</tr>";
 
                 if ( field[ "inputs" ] === null ) {
                     return html;
@@ -82,9 +84,9 @@ class GFVatFieldAddOn extends GFAddOn {
                     id = input.id;
                     inputName = 'input_' + id.toString();
                     inputId = inputName.replace( '.', '_' );
-                    if ( jQuery( 'label[for="' + inputId + '"]' ).length == 0 ) {
-                        continue;
-                    }
+                    // if ( jQuery( 'label[for="' + inputId + '"]' ).length == 0 ) {
+                    //     continue;
+                    // }
                     isHidden = typeof input.isHidden != 'undefined' && input.isHidden ? true : false;
                     title = isHidden ? <?php echo json_encode( esc_html__( 'Inactive',
 						'gravityforms' ) ); ?> : <?php echo json_encode( esc_html__( 'Active', 'gravityforms' ) ); ?>;
@@ -100,6 +102,9 @@ class GFVatFieldAddOn extends GFAddOn {
                     defaultLabel = typeof input.defaultLabel != 'undefined' ? input.defaultLabel : input.label;
                     defaultLabel = defaultLabel.replace( /'/g, "&#039;" );
                     html += "<td><label id='field_custom_input_default_label_" + inputId + "' for='field_custom_input_label_" + input.id + "' class='inline'>" + defaultLabel + "</label></td>";
+                    customLabel = typeof input.customLabel != 'undefined' ? input.customLabel : '';
+                    customLabel = customLabel.replace(/'/g, "&#039;");
+                    html += "<td><input class='field_custom_input_default_label' type='text' placeholder='" + defaultLabel + "' value='" + customLabel + "' id='field_custom_input_label_" + input.id + "' /></td>";
                     html += "</tr>";
                 }
 
@@ -115,11 +120,15 @@ class GFVatFieldAddOn extends GFAddOn {
                         if ( jQuery( '#input_' + number + "_container" ).is( ':visible' ) === false ) {
                             field[ "inputs" ][ i ].isHidden = true;
                         }
+
+                        const inputLabel = jQuery('#input_' + number + "_label").html();
+                        field["inputs"][ i ].customLabel = inputLabel;
                     }
                 }
 
                 return field;
             }
+
 
             /**
              * binding to the load field settings event to initialize the checkbox
@@ -159,6 +168,13 @@ class GFVatFieldAddOn extends GFAddOn {
                     var inputId = jQuery( this ).closest( '.field_custom_input_row' ).data( 'input_id' );
                     ToggleInputHidden( this, inputId );
                 } )
+                .on('input propertychange', '.field_custom_input_default_label', function(){
+                    var inputId = jQuery(this).closest('.field_custom_input_row').data('input_id');
+                    SetInputCustomLabel(this.value, inputId);
+                })
+                .on('input propertychange', '#field_single_custom_label', function(){
+                    SetInputCustomLabel(this.value);
+                });
         </script>
 		<?php
 	}

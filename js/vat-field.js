@@ -4,6 +4,13 @@ jQuery( document ).on( 'change', '.vat_number input', function () {
 
     // validate VAT
     callVatService( this.value, parentId );
+
+    /**
+     * Remove vat country field disable status
+     */
+    $('form').submit(function () {
+        $(".vat_country input").attr("disabled", false);
+    });
 } );
 
 /**
@@ -25,8 +32,6 @@ function callVatService( vat, parentId ) {
         data: data,
         success: function ( response, textStatus, jQxhr ) {
             if ( response.success === false ) {
-                console.log( response.data.error_msg );
-
                 jQuery("#" + parentId + ' .vat_number input')
                 jQuery("#" + parentId ).append( '<div class="vat-warning">' + response.data.error_msg + '</div>' );
 
