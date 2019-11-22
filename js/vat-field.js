@@ -8,8 +8,8 @@ jQuery( document ).on( 'change', '.vat_number input', function () {
     /**
      * Remove vat country field disable status
      */
-    $('form').submit(function () {
-        $(".vat_country input").attr("disabled", false);
+    jQuery('form').submit(function () {
+        jQuery(".vat_country input").attr("disabled", false);
     });
 } );
 
