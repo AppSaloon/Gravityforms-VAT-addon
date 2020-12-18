@@ -1,0 +1,10 @@
+# hidden files and hidden dirs
+*.DS_Store
+*Icon
+*[Tt]humbs.db
+*.Trashes
+.htaccess
+.idea/
+_dev/
+tmp/
+vendor/
