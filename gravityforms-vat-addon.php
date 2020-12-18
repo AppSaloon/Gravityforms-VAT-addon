@@ -27,13 +27,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-/**
- * https://github.com/DragonBe/vies
- * https://vatlayer.com
- * https://trello.com/c/nn9gNp4s/8-klant-worden-form
- * https://javascript.info/fetch
- */
-
 define( 'GF_VAT_FIELD_ADDON_VERSION', '1.0.1' );
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -48,7 +41,7 @@ class GF_Vat_Field_AddOn_Bootstrap {
 			return;
 		}
 
-		require_once( 'class-gfvatfieldaddon.php' );
+		require_once 'class-gfvatfieldaddon.php';
 
 		GFAddOn::register( 'GFVatFieldAddOn' );
 	}

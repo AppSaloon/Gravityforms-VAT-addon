@@ -71,9 +71,11 @@ class Vat_GF_Field extends GF_Field {
 			if ( empty( $vat ) && ! $this->get_input_property( $this->id . '.1', 'isHidden' )
 			) {
 				!
-				$this->failed_validation = true;
-				$this->validation_message = empty( $this->errorMessage ) ? esc_html__( 'This field is required. Please enter a VAT number.',
-					'gravityforms' ) : $this->errorMessage;
+				$this->failed_validation  = true;
+				$this->validation_message = empty( $this->errorMessage ) ? esc_html__(
+					'This field is required. Please enter a VAT number.',
+					'gravityforms'
+				) : $this->errorMessage;
 			}
 		}
 	}
@@ -190,7 +192,7 @@ class Vat_GF_Field extends GF_Field {
 		$hide_country = rgar( $address_country_field_input, 'isHidden' );
 
 		//$country_placeholder = GFCommon::get_input_placeholder_value( $address_country_field_input );
-		$country_list        = $this->get_country_dropdown( $country_value, $address_country_sub_label );
+		$country_list = $this->get_country_dropdown( $country_value, $address_country_sub_label );
 
 		// VAT field.
 		$vat      = '';
@@ -212,13 +214,14 @@ class Vat_GF_Field extends GF_Field {
 			if ( ! $is_admin ) {
 				$vat .= wp_nonce_field( 'vat_validation', 'vat_nonce' );
 			}
-
 		}
 
 		// Company Address field.
 		$company_address = '';
-		$style           = ( $is_admin && ( $this->hideAddress2 || rgar( $company_address_field_input,
-					'isHidden' ) ) ) ? "style='display:none;'" : ''; // support for $this->hideAddress2 legacy property
+		$style           = ( $is_admin && ( $this->hideAddress2 || rgar(
+			$company_address_field_input,
+			'isHidden'
+		) ) ) ? "style='display:none;'" : ''; // support for $this->hideAddress2 legacy property
 		if ( $is_admin || ( ! $this->hideAddress2 && ! rgar( $company_address_field_input, 'isHidden' ) ) ) {
 			$tabindex = $this->get_tabindex();
 			if ( $is_sub_label_above ) {
@@ -267,8 +270,12 @@ class Vat_GF_Field extends GF_Field {
                                     </span>";
 			}
 		} else {
-			$country = sprintf( "<input type='hidden' class='gform_hidden' name='input_%d.6' id='%s_6' value='%s'/>",
-				$id, $field_id, $country_value );
+			$country = sprintf(
+				"<input type='hidden' class='gform_hidden' name='input_%d.6' id='%s_6' value='%s'/>",
+				$id,
+				$field_id,
+				$country_value
+			);
 		}
 
 		$inputs = $vat . $company_address . $company_name . $country;
@@ -320,7 +327,7 @@ class Vat_GF_Field extends GF_Field {
 				$country = $placeholder;
 			}
 			$selected = strtolower( $code ) == $selected_country ? "selected='selected'" : '';
-			$str      .= "<option value='" . esc_attr( $code ) . "' $selected>" . esc_html( $country ) . '</option>';
+			$str     .= "<option value='" . esc_attr( $code ) . "' $selected>" . esc_html( $country ) . '</option>';
 		}
 
 		return $str;
@@ -402,7 +409,7 @@ class Vat_GF_Field extends GF_Field {
 			 * @since Unknown
 			 *
 			 */
-			$response = $vat_number;
+			$response  = $vat_number;
 			$response .= ! empty( $address ) && ! empty( $company_address ) ? $line_break . $company_address : $company_address;
 			$response .= ! empty( $address ) && ( ! empty( $company_name ) || ! empty( $state_value ) ) ? $line_break . $company_name : $company_name;
 			$response .= ! empty( $address ) && ! empty( $country_value ) ? $line_break . $country_value : $country_value;
