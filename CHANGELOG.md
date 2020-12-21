@@ -6,6 +6,10 @@ and this project adheres to [SOP#63 - Project / website versioning](https://docs
 
 ## [Unreleased]
 
+## [1.0.3] - 2020-12-21
+### Changed
+- fixed bitbucket build
+
 ## [1.0.2] - 2020-12-18
 ### Added
 - bitbucket-pipelines.yml
